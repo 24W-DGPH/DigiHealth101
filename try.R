@@ -68,6 +68,20 @@ class(mental_health$hours_per_day)
 
 class(mental_health$age)
 
+# Data visualization ---------------
+
+
+is.na(mental_health)   # find missing values
+
+sum(is.na(mental_health))    #total number of missing values
+
+na.omit(mental_health)   #omit missing values
+
+mean(mental_health$age, na.rm = TRUE)    # calculate mean of age
+
+mean(mental_health$hours_per_day, na.rm = TRUE)   #calculate mean of hours per day
+
+mean(mental_health$bpm, na.rm = TRUE)    #mean of bpm
 
 
 
