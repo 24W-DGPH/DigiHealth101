@@ -44,6 +44,31 @@ mental_health$date <- as.Date(mental_health$timestamp)
 mental_health$time <- format(as.POSIXct(mental_health$timestamp),
                format = "%H:%M:%S")
 
-mental_health = select(mental_health, -1)
+mental_health = select(mental_health, -1)      #delete column
 
-relocate(mental_health, date)
+mental_health = select(mental_health, permissions, everything())   #relocate permission
+
+mental_health = relocate(mental_health, date)   #relocate date
+
+mental_health = relocate(mental_health, time, .after = date)   #relocate time
+
+mental_health %>% 
+  select(where(is.numeric)) %>%           # check columns which are class numeric
+  names()
+
+mental_health %>% 
+  select(contains("date")) %>% 
+  names()
+
+class(mental_health$date)
+
+class(mental_health$while_working)
+
+class(mental_health$hours_per_day)
+
+class(mental_health$age)
+
+
+
+
+
