@@ -40,7 +40,7 @@ mental_health$timestamp <- strptime(as.character(mental_health$timestamp), "%m/%
 format(mental_health$timestamp, "%Y/%m/%d %H:%M:%S")
 
 
-mental_health$date <- as.Date(mental_health$timestamp)
+mental_health$date <- as.Date(mental_health$timestamp)    # create date and time as two column
 mental_health$time <- format(as.POSIXct(mental_health$timestamp),
                format = "%H:%M:%S")
 
@@ -60,6 +60,8 @@ mental_health %>%
   select(contains("date")) %>% 
   names()
 
+
+
 class(mental_health$date)
 
 class(mental_health$while_working)
@@ -67,6 +69,8 @@ class(mental_health$while_working)
 class(mental_health$hours_per_day)
 
 class(mental_health$age)
+
+
 
 # Data visualization ---------------
 
@@ -81,8 +85,19 @@ mean(mental_health$age, na.rm = TRUE)    # calculate mean of age
 
 mean(mental_health$hours_per_day, na.rm = TRUE)   #calculate mean of hours per day
 
-mean(mental_health$bpm, na.rm = TRUE)    #mean of bpm
+mean(mental_health$bpm, na.rm = TRUE)    #mean of beats per minute
 
+ggplot(data = mental_health, mapping = aes(x =age, y = hours_per_day))+
+  geom_point()
 
+ggplot(data = mental_health, mapping = aes(x = bpm))+
+  geom_histogram()
 
-
+ggplot(data = mental_health, 
+       mapping = aes(     #map aesthetics to column values
+         x =age,         #map x axis to age
+         y = primary_streaming_service,         #map y axis to wt
+         color = hours_per_day,    #map color to age
+         size = hours_per_day))+   #map size to age
+  geom_point(                      #display data as points
+    alpha = 0.3)
