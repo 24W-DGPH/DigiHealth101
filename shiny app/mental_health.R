@@ -72,6 +72,9 @@ class(mental_health$hours_per_day)
 
 class(mental_health$age)
 
+mental_health <- mental_health %>% 
+  na.omit(mental_health)             # omit all variable with missing values
+
 
 
 # Data visualization ---------------
@@ -119,6 +122,18 @@ age_count_plot <- ggplot(data = mental_health, mapping = aes(x = age))+
   )
 
 age_count_plot %>% plotly::ggplotly()
+
+
+music_effect_plot <- 
+  ggplot(data = mental_health, 
+         mapping = aes(     #map aesthetics to column values
+           x =age,         #map x axis to age
+           y = hours_per_day,         #map y axis to hours_per_day
+           color = music_effects,  #map color to music effects
+           size = 0.3))+   
+  geom_point(                      #display data as points
+    alpha = 0.7)
+music_effect_plot %>% plotly::ggplotly()
 
 
 
