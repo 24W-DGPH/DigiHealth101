@@ -18,14 +18,15 @@ library(shiny)
 
 # UI definition
 ui <- fluidPage(
-  titlePanel("Mental Health Panel"),
+  titlePanel("Mental Health Panels"),
   sidebarLayout(
     sidebarPanel(
       sliderInput("age", label = "Age", min = 0, max = 100, value = c(0, 100)),
       sliderInput("hours_per_day", label = "Hours per day", min = 0, max = 12, value = c(0, 12))
     ),
     mainPanel(
-      plotOutput("scatter1")
+      plotOutput("scatter1"),     # First static plot
+      plotlyOutput("interactive") # Interactive plot using ggplotly
     )
   )
 )
@@ -33,25 +34,46 @@ ui <- fluidPage(
 # Server logic
 server <- function(input, output) {
   
-  # Function to create scatter plot
-  scatter <- function(mental_health, age_filter, hours_filter) {
+  # First scatter plot: Age vs Hours per Day
+  scatter1 <- function(mental_health, age_filter, hours_filter) {
     filtered_data <- mental_health %>% 
       filter(age >= age_filter[1] & age <= age_filter[2],
              hours_per_day >= hours_filter[1] & hours_per_day <= hours_filter[2])
     
     ggplot(data = filtered_data, 
            mapping = aes(x = age, y = hours_per_day, color = age, size = hours_per_day)) +
-      geom_point(alpha = 0.3)
+      geom_point(alpha = 0.3) +
+      labs(title = "Age vs Hours per Day")
   }
   
-  # Reactive function to filter data and generate the plot
-  scatter_filter <- reactive({
-    scatter(mental_health, input$age, input$hours_per_day)
+  # Reactive function for the first scatter plot
+  scatter_filter1 <- reactive({
+    scatter1(mental_health, input$age, input$hours_per_day)
   })
   
-  # Render the scatter plot
+  # Render the first scatter plot
   output$scatter1 <- renderPlot({
-    scatter_filter()
+    scatter_filter1()
+  })
+  
+  # Second interactive plot: Using ggplotly
+  output$interactive <- renderPlotly({
+    filtered_data <- mental_health %>% 
+      filter(age >= input$age[1] & age <= input$age[2],
+             hours_per_day >= input$hours_per_day[1] & hours_per_day <= input$hours_per_day[2])
+    
+    music_effect_plot <- ggplot(data = filtered_data, 
+                                mapping = aes(
+                                  x = age, 
+                                  y = hours_per_day, 
+                                  color = music_effects)) +
+      geom_point(alpha = 0.7) +
+      labs(title = "Interactive Music Effects Plot", 
+           x = "Age", 
+           y = "Hours per Day") +
+      theme_minimal()
+    
+    ggplotly(music_effect_plot)
   })
 }
 
