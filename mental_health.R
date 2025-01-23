@@ -72,6 +72,8 @@ class(mental_health$hours_per_day)
 
 class(mental_health$age)
 
+mental_health <- mental_health %>% 
+  na.omit(mental_health)
 
 
 # Data visualization ---------------
