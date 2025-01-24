@@ -1,3 +1,5 @@
+#renv --------------------
+
 # Load necessary packages
 pacman::p_load(
   rio,  # data import
@@ -7,9 +9,10 @@ pacman::p_load(
   epikit, # age_categories() function
   matchmaker, # dictionary-based cleaning
   dplyr, # data management
-  ggplot2, # data visualization
+  ggplot2, # data visualization1
   shiny   # shiny app
 )
+
 
 # Assuming 'mental_health' dataset is loaded previously in the code
 source("mental_health.R")

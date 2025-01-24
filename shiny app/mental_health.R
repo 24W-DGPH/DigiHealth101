@@ -62,11 +62,8 @@ mental_health %>%
   select(contains("date")) %>% 
   names()
 
+mental_health = select(mental_health, -3)
 
-
-class(mental_health$date)
-
-class(mental_health$while_working)
 
 class(mental_health$hours_per_day)
 
