@@ -132,5 +132,18 @@ music_effect_plot <-
     alpha = 0.7)
 music_effect_plot %>% plotly::ggplotly()
 
+ggplot(data = mental_health, aes(x = `hours_per_day`, y = anxiety, color = `music_effects`)) +
+  geom_point(alpha = 0.7) +
+  labs(title = "Relationship Between Music Hours and Anxiety",
+       x = "hours_per_day",
+       y = "anxiety") +
+  theme_minimal()
+
+ggplot(data = mental_health, aes(x = `favourite_genre`, fill = `music_effects`)) +
+  geom_bar() +
+  labs(title = "Favorite Music Genres and Their Effects on Mental Health",
+       x = "Favorite Genre",
+       y = "Count") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 
