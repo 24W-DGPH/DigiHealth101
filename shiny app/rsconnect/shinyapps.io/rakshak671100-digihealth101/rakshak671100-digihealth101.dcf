@@ -1,0 +1,12 @@
+name: rakshak671100-digihealth101
+title: shiny app
+username: rakshak671100-digihealth101
+account: rakshak671100-digihealth101
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 13824787
+bundleId: 9708706
+url: https://rakshak671100-digihealth101.shinyapps.io/rakshak671100-digihealth101/
+version: 1
+asMultiple: FALSE
+asStatic: FALSE

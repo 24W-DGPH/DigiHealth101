@@ -1,6 +1,5 @@
-#renv --------------------
-
 # Load necessary packages
+if (!requireNamespace("pacman", quietly = TRUE)) install.packages("pacman")
 pacman::p_load(
   rio,  # data import
   here, # relative file pathway
@@ -8,18 +7,27 @@ pacman::p_load(
   lubridate, # working with dates
   epikit, # age_categories() function
   matchmaker, # dictionary-based cleaning
-  dplyr, # data management
-  ggplot2, # data visualization1
-  shiny   # shiny app
+  tidyverse, # data management and visualizations
+  styler, # source code formatting
+  lintr, # detects bad code patterns
+  skimr, # preview tibbles
+  ggplot2, # data visualization
+  zoo, # extra date functions
+  plotly,   # interactive plots
+  shiny,   # shiny app
+  dplyr    # data manipulation
 )
 
+# Ensure the 'mental_health.csv' file is in the same directory
+if (!file.exists("mental_health.csv")) {
+  stop("The file 'mental_health.csv' was not found in the current working directory.")
+}
 
-# Assuming 'mental_health' dataset is loaded previously in the code
-source("mental_health.R")
+# Load the dataset
+mental_health <- read_csv("mental_health.csv") %>%
+  clean_names() # Clean column names for consistency
 
-library(shiny)
-
-# UI definition
+# Define UI
 ui <- fluidPage(
   titlePanel("Mental Health Panels"),
   sidebarLayout(
@@ -34,38 +42,29 @@ ui <- fluidPage(
   )
 )
 
-# Server logic
-server <- function(input, output) {
+# Define Server
+server <- function(input, output, session) {
+  # Reactive filtering of the dataset
+  filtered_data <- reactive({
+    mental_health %>%
+      filter(
+        age >= input$age[1] & age <= input$age[2],
+        hours_per_day >= input$hours_per_day[1] & hours_per_day <= input$hours_per_day[2]
+      )
+  })
   
-  # First scatter plot: Age vs Hours per Day
-  scatter1 <- function(mental_health, age_filter, hours_filter) {
-    filtered_data <- mental_health %>% 
-      filter(age >= age_filter[1] & age <= age_filter[2],
-             hours_per_day >= hours_filter[1] & hours_per_day <= hours_filter[2])
-    
-    ggplot(data = filtered_data, 
+  # Render the first scatter plot: Age vs Hours per Day
+  output$scatter1 <- renderPlot({
+    ggplot(data = filtered_data(),
            mapping = aes(x = age, y = hours_per_day, color = age, size = hours_per_day)) +
       geom_point(alpha = 0.3) +
-      labs(title = "Age vs Hours per Day")
-  }
-  
-  # Reactive function for the first scatter plot
-  scatter_filter1 <- reactive({
-    scatter1(mental_health, input$age, input$hours_per_day)
+      labs(title = "Age vs Hours per Day", x = "Age", y = "Hours per Day") +
+      theme_minimal()
   })
   
-  # Render the first scatter plot
-  output$scatter1 <- renderPlot({
-    scatter_filter1()
-  })
-  
-  # Second interactive plot: Using ggplotly
+  # Render the interactive plot using ggplotly
   output$interactive <- renderPlotly({
-    filtered_data <- mental_health %>% 
-      filter(age >= input$age[1] & age <= input$age[2],
-             hours_per_day >= input$hours_per_day[1] & hours_per_day <= input$hours_per_day[2])
-    
-    music_effect_plot <- ggplot(data = filtered_data, 
+    music_effect_plot <- ggplot(data = filtered_data(),
                                 mapping = aes(
                                   x = age, 
                                   y = hours_per_day, 
@@ -76,9 +75,9 @@ server <- function(input, output) {
            y = "Hours per Day") +
       theme_minimal()
     
-    ggplotly(music_effect_plot)
+    ggplotly(music_effect_plot) # Correctly pass the full ggplot object to ggplotly()
   })
 }
 
-# Run the shiny app
+# Run the Shiny App
 shinyApp(ui = ui, server = server)

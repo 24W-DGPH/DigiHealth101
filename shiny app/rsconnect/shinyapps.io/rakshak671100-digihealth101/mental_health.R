@@ -11,20 +11,20 @@ pacman::p_load(
   lubridate, # working with dates
   epikit, # age_categories() function
   matchmaker, # dictionary based cleaning
+  group_by, # groups one or more variables
   tidyverse, # data management and visualizations
   styler, # source code formatting
   lintr, # detects bad code pattern
   skimr, # preview tibbles
   ggplot2, # data visualization
   zoo, # extra date functions
+  as.Date, #date manipulation
+  as.POSIXct, #date manipulation
   plotly,   #interactive plots
-  shiny,   # shiny app
-  dplyr,    #data manipulation
-  BiocManager
+  shiny   # shiny app
 )
-
 # Import data ------------------
-  mental_health <- import("mental_health.csv")
+  mental_health <- import("mental health.csv")
   mental_health_dirty <- mental_health
 
 skimr:: skim(mental_health_dirty)
@@ -62,18 +62,16 @@ mental_health %>%
   select(contains("date")) %>% 
   names()
 
+mental_health = select(mental_health, -3)
 
-
-class(mental_health$date)
-
-class(mental_health$while_working)
 
 class(mental_health$hours_per_day)
 
 class(mental_health$age)
 
 mental_health <- mental_health %>% 
-  na.omit(mental_health)
+  na.omit(mental_health)             # omit all variable with missing values
+
 
 
 # Data visualization ---------------
@@ -111,7 +109,7 @@ ggplot(data = mental_health,
          color = primary_streaming_service,    #map color to primary_streaming_service
          size = primary_streaming_service))+   #map size to primary_streaming_service
   geom_point(                      #display data as points
-    alpha = 0.6)
+    alpha = 0.3)
 
 age_count_plot <- ggplot(data = mental_health, mapping = aes(x = age))+
   geom_histogram(
@@ -122,17 +120,17 @@ age_count_plot <- ggplot(data = mental_health, mapping = aes(x = age))+
 
 age_count_plot %>% plotly::ggplotly()
 
+
 music_effect_plot <- 
   ggplot(data = mental_health, 
-       mapping = aes(     #map aesthetics to column values
-         x =age,         #map x axis to age
-         y = hours_per_day,         #map y axis to hours_per_day
-         color = favourite_genre,  #map color to music effects
-         size = 0.3))+   
+         mapping = aes(     #map aesthetics to column values
+           x =age,         #map x axis to age
+           y = hours_per_day,         #map y axis to hours_per_day
+           color = music_effects,  #map color to music effects
+           size = 0.3))+   
   geom_point(                      #display data as points
-    alpha = 0.6)
+    alpha = 0.7)
 music_effect_plot %>% plotly::ggplotly()
-
 
 ggplot(data = mental_health, aes(x = `hours_per_day`, y = anxiety, color = `music_effects`)) +
   geom_point(alpha = 0.7) +
@@ -147,4 +145,5 @@ ggplot(data = mental_health, aes(x = `favourite_genre`, fill = `music_effects`))
        x = "Favorite Genre",
        y = "Count") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
 
