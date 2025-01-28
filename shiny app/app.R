@@ -36,8 +36,8 @@ ui <- fluidPage(
       sliderInput("hours_per_day", label = "Hours per day", min = 0, max = 12, value = c(0, 12))
     ),
     mainPanel(
-      plotOutput("scatter1"),     # First static plot
-      plotlyOutput("interactive") # Interactive plot using ggplotly
+      plotOutput("scatter1"), # First static plot (Age vs Hours per Day)
+      plotOutput("genre_effects") # Bar plot for Favorite Genre and Music Effects
     )
   )
 )
@@ -62,20 +62,14 @@ server <- function(input, output, session) {
       theme_minimal()
   })
   
-  # Render the interactive plot using ggplotly
-  output$interactive <- renderPlotly({
-    music_effect_plot <- ggplot(data = filtered_data(),
-                                mapping = aes(
-                                  x = age, 
-                                  y = hours_per_day, 
-                                  color = music_effects)) +
-      geom_point(alpha = 0.7) +
-      labs(title = "Interactive Music Effects Plot", 
-           x = "Age", 
-           y = "Hours per Day") +
-      theme_minimal()
-    
-    ggplotly(music_effect_plot) # Correctly pass the full ggplot object to ggplotly()
+  # Render the bar plot for Favorite Genre and Music Effects
+  output$genre_effects <- renderPlot({
+    ggplot(data = filtered_data(), aes(x = fav_genre, fill = music_effects)) +
+      geom_bar() +
+      labs(title = "Favorite Music Genres and Their Effects on Mental Health",
+           x = "Favorite Genre",
+           y = "Count") +
+      theme(axis.text.x = element_text(angle = 45, hjust = 1))
   })
 }
 
