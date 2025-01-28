@@ -20,7 +20,7 @@ pacman::p_load(
   styler, # source code formatting
   lintr, # detects bad code patterns, which are not errors
   #
-  skimr, # preview tibbles (aka data frames)
+  skimr, # previdata:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAAbElEQVR4Xs2RQQrAMAgEfZgf7W9LAguybljJpR3wEse5JOL3ZObDb4x1loDhHbBOFU6i2Ddnw2KNiXcdAXygJlwE8OFVBHDgKrLgSInN4WMe9iXiqIVsTMjH7z/GhNTEibOxQswcYIWYOR/zAjBJfiXh3jZ6AAAAAElFTkSuQmCCew tibbles (aka data frames)
   todor # add TODO comments to your project
 )
 
