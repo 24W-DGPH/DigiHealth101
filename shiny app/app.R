@@ -27,6 +27,15 @@ if (!file.exists("mental_health.csv")) {
 mental_health <- read_csv("mental_health.csv") %>%
   clean_names() # Clean column names for consistency
 
+# Check if required columns exist
+required_columns <- c("age", "hours_per_day", "fav_genre", "music_effects")
+missing_columns <- setdiff(required_columns, names(mental_health))
+
+if (length(missing_columns) > 0) {
+  stop(paste("The dataset is missing the following required columns:", 
+             paste(missing_columns, collapse = ", ")))
+}
+
 # Define UI
 ui <- fluidPage(
   titlePanel("Mental Health Panels"),
@@ -36,8 +45,8 @@ ui <- fluidPage(
       sliderInput("hours_per_day", label = "Hours per day", min = 0, max = 12, value = c(0, 12))
     ),
     mainPanel(
-      plotOutput("scatter1"), # First static plot (Age vs Hours per Day)
-      plotOutput("genre_effects") # Bar plot for Favorite Genre and Music Effects
+      plotOutput("scatter1"),          # First static plot (Age vs Hours per Day)
+      plotlyOutput("genre_effects")   # Updated: Interactive bar plot
     )
   )
 )
@@ -55,6 +64,9 @@ server <- function(input, output, session) {
   
   # Render the first scatter plot: Age vs Hours per Day
   output$scatter1 <- renderPlot({
+    validate(
+      need(nrow(filtered_data()) > 0, "No data available for the selected filters.")
+    )
     ggplot(data = filtered_data(),
            mapping = aes(x = age, y = hours_per_day, color = age, size = hours_per_day)) +
       geom_point(alpha = 0.3) +
@@ -62,14 +74,20 @@ server <- function(input, output, session) {
       theme_minimal()
   })
   
-  # Render the bar plot for Favorite Genre and Music Effects
-  output$genre_effects <- renderPlot({
-    ggplot(data = filtered_data(), aes(x = fav_genre, fill = music_effects)) +
+  # Render the interactive bar plot for Favorite Genre and Music Effects
+  output$genre_effects <- renderPlotly({
+    validate(
+      need(nrow(filtered_data()) > 0, "No data available for the selected filters."),
+      need(!is.null(filtered_data()$fav_genre), "Missing 'fav_genre' column in data."),
+      need(!is.null(filtered_data()$music_effects), "Missing 'music_effects' column in data.")
+    )
+    plot <- ggplot(data = filtered_data(), aes(x = fav_genre, fill = music_effects)) +
       geom_bar() +
       labs(title = "Favorite Music Genres and Their Effects on Mental Health",
            x = "Favorite Genre",
            y = "Count") +
       theme(axis.text.x = element_text(angle = 45, hjust = 1))
+    ggplotly(plot)
   })
 }
 
