@@ -40,37 +40,31 @@ if (length(missing_columns) > 0) {
 ui <- fluidPage(
   titlePanel("Mental Health Panels"),
   tabsetPanel(
-    tabPanel("Hours listening to music", 
+    tabPanel("Hours listening to music",
              sidebarLayout(
                sidebarPanel(
                  sliderInput("age", label = "Age", min = 0, max = 100, value = c(0, 100)),
                  sliderInput("hours_per_day", label = "Hours per day", min = 0, max = 12, value = c(0, 12))
                ),
-               mainPanel(
-                 plotOutput("scatter1")
-               )
+               mainPanel(plotOutput("scatter1"))
              )
     ),
-    tabPanel("Effect of Music on Mental Health", 
+    tabPanel("Effect of Music on Mental Health",
              sidebarLayout(
                sidebarPanel(
                  sliderInput("age", label = "Age", min = 0, max = 100, value = c(0, 100))
                ),
-               mainPanel(
-                 plotlyOutput("genre_effects")
-               )
+               mainPanel(plotlyOutput("genre_effects"))
              )
     ),
-    tabPanel("Primary Streaming Service", 
+    tabPanel("Primary Streaming Service",
              sidebarLayout(
                sidebarPanel(
                  selectInput("streaming_service", label = "Primary Streaming Service", 
-                             choices = c("All", "Spotify", "Apple Music", "Pandora", "Other streaming service"),
+                             choices = c("All", "Spotify", "Apple Music", "Pandora", "YouTube Music", "Other streaming service", "I do not use a streaming service."),
                              selected = "All")
                ),
-               mainPanel(
-                 plotOutput("scatter2")
-               )
+               mainPanel(plotOutput("scatter2"))
              )
     )
   )
@@ -101,13 +95,12 @@ server <- function(input, output, session) {
   
   # Render the interactive bar plot for Favorite Genre and Music Effects
   output$genre_effects <- renderPlotly({
-    filtered_genre_data <- filtered_data()
     validate(
-      need(nrow(filtered_genre_data) > 0, "No data available for the selected filters."),
-      need(!is.null(filtered_genre_data$fav_genre), "Missing 'fav_genre' column in data."),
-      need(!is.null(filtered_genre_data$music_effects), "Missing 'music_effects' column in data.")
+      need(nrow(filtered_data()) > 0, "No data available for the selected filters."),
+      need(!is.null(filtered_data()$fav_genre), "Missing 'fav_genre' column in data."),
+      need(!is.null(filtered_data()$music_effects), "Missing 'music_effects' column in data.")
     )
-    plot <- ggplot(data = filtered_genre_data, aes(x = fav_genre, fill = music_effects)) +
+    plot <- ggplot(data = filtered_data(), aes(x = fav_genre, fill = music_effects)) +
       geom_bar() +
       labs(title = "Favorite Music Genres and Their Effects on Mental Health",
            x = "Favorite Genre",
@@ -118,19 +111,27 @@ server <- function(input, output, session) {
   
   # Render the third scatter plot: Age vs Hours per Day filtered by Streaming Service
   output$scatter2 <- renderPlot({
-    if (input$streaming_service == "All") {
-      plot_data <- mental_health
+    filtered_streaming_data <- if (input$streaming_service == "All") {
+      mental_health
     } else {
-      plot_data <- mental_health %>%
+      mental_health %>%
         filter(primary_streaming_service == input$streaming_service)
     }
     
     validate(
-      need(nrow(plot_data) > 0, "No data available for the selected streaming service.")
+      need(nrow(filtered_streaming_data) > 0, "No data available for the selected streaming service.")
     )
     
-    ggplot(plot_data, aes(x = age, y = hours_per_day, color = primary_streaming_service)) +
+    ggplot(filtered_streaming_data, aes(x = age, y = hours_per_day, color = primary_streaming_service)) +
       geom_point(size = 3) +
+      scale_color_manual(values = c(
+        "Spotify" = "#1DB954",
+        "Apple Music" = "#FF1493",
+        "Pandora" = "#0057B7",
+        "YouTube Music" = "#FF0000",
+        "Other streaming service" = "#A020F0",
+        "I do not use a streaming service." = "#FF8C00"
+      )) +
       labs(title = "Streaming Hours vs Age (Filtered by Streaming Service)",
            x = "Age",
            y = "Hours per Day",
