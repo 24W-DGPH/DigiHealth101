@@ -11,20 +11,17 @@ pacman::p_load(
   lubridate, # working with dates
   epikit, # age_categories() function
   matchmaker, # dictionary based cleaning
-  group_by, # groups one or more variables
   tidyverse, # data management and visualizations
   styler, # source code formatting
   lintr, # detects bad code pattern
   skimr, # preview tibbles
   ggplot2, # data visualization
   zoo, # extra date functions
-  as.Date, #date manipulation
-  as.POSIXct, #date manipulation
   plotly,   #interactive plots
   shiny   # shiny app
 )
 # Import data ------------------
-  mental_health <- import("mental health.csv")
+  mental_health <- import("mental_health.csv")
   mental_health_dirty <- mental_health
 
 skimr:: skim(mental_health_dirty)
@@ -146,4 +143,11 @@ ggplot(data = mental_health, aes(x = `favourite_genre`, fill = `music_effects`))
        y = "Count") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
+ggplot(mental_health, aes(x = age, y = hours_per_day, color = primary_streaming_service)) +
+  geom_point(size = 3) +
+  labs(title = "Streaming Hours vs Age",
+       x = "Age",
+       y = "Hours per Day",
+       color = "Streaming Service") +
+  theme_minimal()
 
