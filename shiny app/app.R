@@ -39,24 +39,39 @@ if (length(missing_columns) > 0) {
 # Define UI
 ui <- fluidPage(
   titlePanel("Mental Health Panels"),
-  sidebarLayout(
-    sidebarPanel(
-      sliderInput("age", label = "Age", min = 0, max = 100, value = c(0, 100)),
-      sliderInput("hours_per_day", label = "Hours per day", min = 0, max = 12, value = c(0, 12))
+  tabsetPanel(
+    tabPanel("Hours listening to music", 
+             sidebarLayout(
+               sidebarPanel(
+                 sliderInput("age", label = "Age", min = 0, max = 100, value = c(0, 100)),
+                 sliderInput("hours_per_day", label = "Hours per day", min = 0, max = 12, value = c(0, 12))
+               ),
+               mainPanel(
+                 plotOutput("scatter1")
+               )
+             )
     ),
-    mainPanel(
-      plotOutput("scatter1"),          # First static plot (Age vs Hours per Day)
-      plotlyOutput("genre_effects")    # Interactive bar plot
-    )
-  ),
-  sidebarLayout(
-    sidebarPanel(
-      selectInput("streaming_service", label = "Primary Streaming Service", 
-                  choices = c("All", "Spotify", "Apple Music", "Pandora", "Other streaming service"),
-                  selected = "All")
+    tabPanel("Effect of Music on Mental Health", 
+             sidebarLayout(
+               sidebarPanel(
+                 sliderInput("age", label = "Age", min = 0, max = 100, value = c(0, 100))
+               ),
+               mainPanel(
+                 plotlyOutput("genre_effects")
+               )
+             )
     ),
-    mainPanel(
-      plotOutput("scatter2")           # Third plot (Age vs Hours per Day filtered by Streaming Service)
+    tabPanel("Primary Streaming Service", 
+             sidebarLayout(
+               sidebarPanel(
+                 selectInput("streaming_service", label = "Primary Streaming Service", 
+                             choices = c("All", "Spotify", "Apple Music", "Pandora", "Other streaming service"),
+                             selected = "All")
+               ),
+               mainPanel(
+                 plotOutput("scatter2")
+               )
+             )
     )
   )
 )
@@ -86,12 +101,13 @@ server <- function(input, output, session) {
   
   # Render the interactive bar plot for Favorite Genre and Music Effects
   output$genre_effects <- renderPlotly({
+    filtered_genre_data <- filtered_data()
     validate(
-      need(nrow(filtered_data()) > 0, "No data available for the selected filters."),
-      need(!is.null(filtered_data()$fav_genre), "Missing 'fav_genre' column in data."),
-      need(!is.null(filtered_data()$music_effects), "Missing 'music_effects' column in data.")
+      need(nrow(filtered_genre_data) > 0, "No data available for the selected filters."),
+      need(!is.null(filtered_genre_data$fav_genre), "Missing 'fav_genre' column in data."),
+      need(!is.null(filtered_genre_data$music_effects), "Missing 'music_effects' column in data.")
     )
-    plot <- ggplot(data = filtered_data(), aes(x = fav_genre, fill = music_effects)) +
+    plot <- ggplot(data = filtered_genre_data, aes(x = fav_genre, fill = music_effects)) +
       geom_bar() +
       labs(title = "Favorite Music Genres and Their Effects on Mental Health",
            x = "Favorite Genre",
@@ -100,30 +116,21 @@ server <- function(input, output, session) {
     ggplotly(plot)
   })
   
-  # Define a custom color palette
-  streaming_colors <- c(
-    "Spotify" = "#1DB954",   # Bright Green
-    "Apple Music" = "#FA57C1", # Pink
-    "Pandora" = "#0057B8",   # Deep Blue
-    "Other streaming service" = "#FF7F00" # Orange
-  )
-  
   # Render the third scatter plot: Age vs Hours per Day filtered by Streaming Service
   output$scatter2 <- renderPlot({
     if (input$streaming_service == "All") {
-      filtered_streaming_data <- filtered_data()
+      plot_data <- mental_health
     } else {
-      filtered_streaming_data <- filtered_data() %>%
+      plot_data <- mental_health %>%
         filter(primary_streaming_service == input$streaming_service)
     }
     
     validate(
-      need(nrow(filtered_streaming_data) > 0, "No data available for the selected streaming service.")
+      need(nrow(plot_data) > 0, "No data available for the selected streaming service.")
     )
     
-    ggplot(filtered_streaming_data, aes(x = age, y = hours_per_day, color = primary_streaming_service)) +
+    ggplot(plot_data, aes(x = age, y = hours_per_day, color = primary_streaming_service)) +
       geom_point(size = 3) +
-      scale_color_manual(values = streaming_colors) +
       labs(title = "Streaming Hours vs Age (Filtered by Streaming Service)",
            x = "Age",
            y = "Hours per Day",
