@@ -148,3 +148,11 @@ ggplot(data = mental_health, aes(x = `favourite_genre`, fill = `music_effects`))
        y = "Count") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
+ggplot(mental_health, aes(x = age, y = hours_per_day, color = primary_streaming_service)) +
+  geom_point(size = 3) +
+  labs(title = "Streaming Hours vs Age",
+       x = "Age",
+       y = "Hours per Day",
+       color = "Streaming Service") +
+  theme_minimal()
+
