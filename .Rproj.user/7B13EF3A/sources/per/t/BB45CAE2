@@ -1,0 +1,26 @@
+{
+    "id": "BB45CAE2",
+    "path": "D:/global public health/digital health/DigiHealth101/DigiHealth101/shiny app/mental_health.R",
+    "project_path": "shiny app/mental_health.R",
+    "type": "r_source",
+    "hash": "3530535422",
+    "contents": "",
+    "dirty": false,
+    "created": 1737703491647.0,
+    "source_on_save": false,
+    "relative_order": 3,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "74,0",
+        "scrollLine": "58"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1737708732,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1737708732571,
+    "read_only": false,
+    "read_only_alternatives": []
+}
